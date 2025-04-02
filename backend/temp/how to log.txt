@@ -1,0 +1,25 @@
+const fs = require('fs');
+const path = require('path');
+const logDir = path.join(__dirname, 'log');
+
+// 确保log目录存在
+if (!fs.existsSync(logDir)){
+    fs.mkdirSync(logDir);
+}
+
+// 创建日志函数
+function logToFile(message) {
+    const logFile = path.join(logDir, `${new Date().toISOString().split('T')[0]}.log`);
+    fs.appendFileSync(logFile, `${new Date().toISOString()} - ${message}\n`);
+}
+
+// 在需要的地方使用，例如：
+app.post('/api/chat', express.json(), async (req, res) => {
+    try {
+        logToFile(`收到聊天请求: ${req.body.message}`);
+        // ...原有代码...
+    } catch (error) {
+        logToFile(`聊天接口错误: ${error.message}`);
+        // ...原有代码...
+    }
+});

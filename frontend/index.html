@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 在head部分添加以下meta标签 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- 修改按钮增加触控区域 -->
+    <button id="recommend-btn" class="touch-button">获取今日推荐</button>
+    <title>咖啡推荐系统</title>
+    <head>
+        <!-- 确保link路径正确 -->
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+</head>
+<body>
+    <h1>欢迎来到咖啡推荐系统</h1>
+    
+    <div>
+        <h2>新用户推荐</h2>
+        <button id="recommend-btn">获取今日推荐</button>
+        <div id="new-recommend"></div>
+    </div>
+
+    <div>
+        <h2>提交评价</h2>
+        <select id="coffee-select">
+            <option value="1">美式咖啡</option>
+            <option value="2">拿铁咖啡</option>
+            <option value="3">冷萃咖啡</option>
+        </select>
+        <input type="number" id="rating" min="1" max="5" placeholder="评分(1-5)">
+        <button id="submit-btn">提交评分</button>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

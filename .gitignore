@@ -1,0 +1,87 @@
+# 开发环境配置
+.env
+*.env.local
+.env.*.local
+.env.development
+.env.production
+
+# 后端相关
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+*.egg
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.ipynb_checkpoints/
+
+# 前端相关
+node_modules/
+dist/
+build/
+.sass-cache/
+*.css.map
+*.js.map
+.cache/
+.next/
+out/
+
+# 编辑器/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# 系统文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log.*
+logs/
+
+# 测试相关
+coverage/
+.nyc_output/
+test-results/
+junit.xml
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+/database/*.json
+!database/coffee_data.json
+
+# 构建输出
+*.exe
+*.out
+*.app
+bin/
+obj/
+
+# 临时文件
+*.tmp
+*.temp
+*~
+~$*
+
+# 文档
+*.bak
+*.backup
+
+# 日记文件
+daily_notes/*.md
+.env
