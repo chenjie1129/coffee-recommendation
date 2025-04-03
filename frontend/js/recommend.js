@@ -61,32 +61,29 @@ async function submitRating() {
 
 // 新增聊天功能
 async function chatWithBarista() {
-    const message = document.getElementById('chat-input').value;
-    const chatHistory = document.getElementById('chat-history');
-    
-    chatHistory.innerHTML += `<div class="user-msg">${message}</div>`;
-    
     try {
+        const chatHistory = document.getElementById('chat-history'); // 新增这行
         const response = await fetch('http://localhost:3000/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message })
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                message: document.getElementById('chat-input').value 
+            })
         });
 
         if (!response.ok) {
-            const errorData = await response.json(); // 尝试获取错误详情
-            throw new Error(errorData.error || `HTTP错误: ${response.status}`);
+            const error = await response.json();
+            throw new Error(error.error || '请求失败');
         }
 
         const data = await response.json();
         chatHistory.innerHTML += `<div class="bot-msg">${data.reply}</div>`;
         
     } catch (error) {
-        console.error('完整错误详情:', {
-            message: error.message,
-            stack: error.stack
-        });
-        chatHistory.innerHTML += `<div class="error-msg">服务暂时不可用: ${error.message}</div>`;
+        console.error('聊天错误:', error);
+        // 显示错误提示给用户
     }
 }
 

@@ -126,9 +126,25 @@ app.post('/api/chat', express.json(), async (req, res) => {
     try {
         const { message } = req.body;
         
-        // 在环境变量中配置API Key
+        // 打印用户发送的消息
+        console.log('用户消息:', message);
+        
         require('dotenv').config();
         const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+        
+        const requestBody = {
+            model: "deepseek-chat",
+            messages: [{
+                role: "system",
+                content: "你是一个专业的咖啡师助手，帮助用户选择适合的咖啡。"
+            }, {
+                role: "user",
+                content: message
+            }]
+        };
+
+        // 打印请求体
+        console.log('发送给DeepSeek的请求:', JSON.stringify(requestBody, null, 2));
         
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
             method: 'POST',
@@ -136,16 +152,7 @@ app.post('/api/chat', express.json(), async (req, res) => {
                 'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                model: "deepseek-chat",
-                messages: [{
-                    role: "system",
-                    content: "你是一个专业的咖啡师助手，帮助用户选择适合的咖啡。"
-                }, {
-                    role: "user",
-                    content: message
-                }]
-            })
+            body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
@@ -153,6 +160,10 @@ app.post('/api/chat', express.json(), async (req, res) => {
         }
 
         const data = await response.json();
+        
+        // 打印DeepSeek的完整响应
+        console.log('DeepSeek API响应:', JSON.stringify(data, null, 2));
+        
         res.json({ reply: data.choices[0].message.content });
         
     } catch (error) {
@@ -160,5 +171,12 @@ app.post('/api/chat', express.json(), async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-require('dotenv').config();
+// 修改文件末尾部分：
+// 移除重复的path声明
+require('dotenv').config({ 
+    path: path.join(__dirname, '.env') 
+});
+
+// 测试环境变量
+console.log('API Key:', process.env.DEEPSEEK_API_KEY);
 console.log('API Key长度:', process.env.DEEPSEEK_API_KEY?.length);
