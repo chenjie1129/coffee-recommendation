@@ -38,9 +38,9 @@ app.get('/recommend/new', async (req, res) => {
     
     const options = {
         mode: 'text',
-        pythonPath: '/usr/bin/python3', // 请先用which python3确认路径
+        pythonPath: '/usr/bin/python3',
         scriptPath: __dirname,
-        args: ['new']
+        args: ['new', '--limit=1']  // 新增limit参数限制为1种
     };
 
     try {
@@ -61,7 +61,12 @@ app.get('/recommend/new', async (req, res) => {
             console.log('Python执行完成，输出:', output);
             try {
                 const data = JSON.parse(output);
-                res.json(data);
+                // 确保只返回1种咖啡
+                if(Array.isArray(data)) {
+                    res.json(data[0]);  // 只返回数组第一个元素
+                } else {
+                    res.json(data);
+                }
             } catch(e) {
                 console.error('JSON解析错误:', e);
                 res.status(500).json({error: '无效的JSON格式'});
@@ -180,3 +185,101 @@ require('dotenv').config({
 // 测试环境变量
 console.log('API Key:', process.env.DEEPSEEK_API_KEY);
 console.log('API Key长度:', process.env.DEEPSEEK_API_KEY?.length);
+
+// 添加用户状态检查接口
+app.get('/api/user/status', (req, res) => {
+    // 这里应该根据实际业务逻辑检查用户状态
+    // 示例：假设通过cookie或token识别用户
+    const userId = req.cookies?.userId || req.headers['x-user-id'];
+    const isNewUser = !database.customers[userId];
+    
+    res.json({ isNewUser });
+});
+
+// 添加获取用户最后订单接口
+app.get('/api/user/last-order', (req, res) => {
+    // 这里应该根据实际业务获取用户最后订单
+    // 示例代码：
+    const userId = req.cookies?.userId || req.headers['x-user-id'];
+    const user = database.customers[userId];
+    
+    if(user && user.lastOrder) {
+        res.json({ lastOrder: user.lastOrder.coffeeId });
+    } else {
+        res.json({ lastOrder: null });
+    }
+});
+
+// 新增用户引导状态接口
+app.post('/api/user/onboarding', (req, res) => {
+    const { userId, name, preferences } = req.body;
+    
+    // 初始化用户数据
+    if (!database.customers[userId]) {
+        database.customers[userId] = {
+            name,
+            preferences: preferences || [],
+            onboardingComplete: false,
+            lastOrder: null
+        };
+    }
+    
+    // 标记引导完成
+    database.customers[userId].onboardingComplete = true;
+    fs.writeFileSync('database.json', JSON.stringify(database));
+    
+    res.json({ success: true });
+});
+
+// 新增口味偏好选项接口
+app.get('/api/preference-options', (req, res) => {
+    res.json([
+        { id: 'sweet', name: '甜味' },
+        { id: 'bitter', name: '苦味' },
+        { id: 'fruity', name: '果香' },
+        { id: 'nutty', name: '坚果香' },
+        { id: 'strong', name: '浓郁' }
+    ]);
+});
+
+// 新增管理数据接口
+app.get('/api/admin/dashboard', (req, res) => {
+    try {
+        const stats = {
+            totalUsers: Object.keys(database.customers).length,
+            totalOrders: database.orders.length,
+            popularCoffee: getPopularCoffee(),
+            averageRating: getAverageRating(),
+            userGrowth: getUserGrowthData(),
+            recentOrders: database.orders.slice(-10).reverse()
+        };
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 辅助函数
+function getPopularCoffee() {
+    const count = {};
+    database.orders.forEach(order => {
+        count[order.coffeeId] = (count[order.coffeeId] || 0) + 1;
+    });
+    return Object.entries(count).sort((a, b) => b[1] - a[1])[0];
+}
+
+function getAverageRating() {
+    if (database.orders.length === 0) return 0;
+    const sum = database.orders.reduce((acc, order) => acc + (order.rating || 0), 0);
+    return (sum / database.orders.length).toFixed(1);
+}
+
+function getUserGrowthData() {
+    // 按日期统计用户增长
+    const growth = {};
+    Object.values(database.customers).forEach(user => {
+        const date = new Date(user.createdAt || Date.now()).toLocaleDateString();
+        growth[date] = (growth[date] || 0) + 1;
+    });
+    return growth;
+}

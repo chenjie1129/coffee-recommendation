@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <!-- 在head部分添加以下meta标签 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes"> <!-- 为了兼容性可以保留 -->
 
     <!-- 修改按钮增加触控区域 -->
     <button id="recommend-btn" class="touch-button">获取今日推荐</button>
@@ -17,8 +18,20 @@
 <body>
     <h1>欢迎来到咖啡推荐系统</h1>
     
-    <div>
-        <h2>新用户推荐</h2>
+    <!-- 新用户界面 -->
+    <div id="new-user-section" class="user-section">
+        <h2>欢迎新用户</h2>
+        <button id="recommend-btn">获取今日推荐</button>
+        <div id="new-recommend"></div>
+    </div>
+    
+    <!-- 老用户界面 -->
+    <div id="returning-user-section" class="user-section">
+        <h2>欢迎回来</h2>
+        <div class="last-order">
+            <h3>您上次点的是：<span id="last-order-name"></span></h3>
+            <p>要再来一杯吗？</p>
+        </div>
         <button id="recommend-btn">获取今日推荐</button>
         <div id="new-recommend"></div>
     </div>
